@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CashApp Clone</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000;
+            color: white;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            padding-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            background: #121212;
+            width: 100%;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .balance {
+            font-size: 40px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .subtext {
+            color: gray;
+            font-size: 16px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .button {
+            background: #222;
+            color: white;
+            padding: 15px;
+            width: 48%;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .button:hover {
+            background: #333;
+        }
+
+        .button:active {
+            transform: scale(0.95);
+        }
+
+        .highlight {
+            background: #00d632;
+            color: black;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: #000;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 400px;
+            border-top: 1px solid #222;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: #00d632;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .nav-item.active {
+            color: #00d632;
+        }
+
+        /* Fullscreen Modals */
+        .fullscreen-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .fullscreen-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .money-display {
+            font-size: 60px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .money-display.updated {
+            transform: scale(1.1);
+        }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .numpad button {
+            background: #222;
+            border: none;
+            color: white;
+            font-size: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .numpad button:active {
+            transform: scale(0.95);
+        }
+
+        .continue-button {
+            background: #00d632;
+            color: black;
+            padding: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            margin-top: 30px;
+            cursor: pointer;
+            width: 80%;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .continue-button:active {
+            transform: scale(0.95);
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Confirmation Screen */
+        .confirmation-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .confirmation-screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .confirmation-circle {
+            width: 100px;
+            height: 100px;
+            background: #00d632;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: black;
+            margin-bottom: 20px;
+            animation: pop 0.5s ease;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .confirmation-message {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .done-button {
+            background: #00d632;
+            color: black;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .done-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Loading Animation */
+        .loading-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .loading-circle {
+            border: 4px solid #00d632;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 18px;
+            color: white;
+        }
+
+        /* Bottom Section - Rounded Cubes */
+        .bottom-section {
+            width: 100%;
+            max-width: 400px;
+            background: #000;
+            padding: 20px;
+            border-top: 1px solid #222;
+            margin-bottom: 80px;
+        }
+
+        .bottom-section h3 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .bottom-section p {
+            color: gray;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .cube-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .cube {
+            background: #121212;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .cube:hover {
+            transform: scale(1.05);
+            background: #222;
+        }
+
+        .cube i {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .cube h4 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .cube p {
+            color: gray;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Money</h2>
+        <div class="section">
+            <p class="subtext">Cash Balance</p>
+            <p class="balance">$<span id="balance">500.00</span></p>
+            <div class="buttons">
+                <button class="button highlight" onclick="openAddMoneyScreen()">Add Money</button>
+                <button class="button" onclick="openWithdrawScreen()">Withdraw</button>
+            </div>
+        </div>
+
+        <!-- Bottom Section - Rounded Cubes -->
+        <div class="bottom-section">
+            <h3>Your Money</h3>
+            <p>Grow your money with CashApp.</p>
+            <div class="cube-container">
+                <div class="cube" onclick="openSavingsScreen()">
+                    <i>💰</i>
+                    <h4>Savings</h4>
+                    <p>Start saving for your goals.</p>
+                </div>
+                <div class="cube" onclick="openInvestingScreen()">
+                    <i>📈</i>
+                    <h4>Investing</h4>
+                    <p>Grow your wealth.</p>
+                </div>
+                <div class="cube" onclick="openBitcoinScreen()">
+                    <i>₿</i>
+                    <h4>Bitcoin</h4>
+                    <p>Buy and sell Bitcoin.</p>
+                </div>
+                <div class="cube" onclick="openStocksScreen()">
+                    <i>📊</i>
+                    <h4>Stocks</h4>
+                    <p>Invest in the stock market.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a class="nav-item active" href="#">
+            <i>🏠</i>
+            <span>Home</span>
+        </a>
+        <a class="nav-item" href="#">
+            <i>📈</i>
+            <span>Investing</span>
+        </a>
+        <a class="nav-item" href="#">
+            <i>🏦</i>
+            <span>Banking</span>
+        </a>
+        <a class="nav-item" href="#">
+            <i>💳</i>
+            <span>Cards</span>
+        </a>
+        <a class="nav-item" href="#">
+            <i>📊</i>
+            <span>Activity</span>
+        </a>
+    </div>
+
+    <!-- Add Money Screen -->
+    <div id="add-money-screen" class="fullscreen-modal">
+        <button class="back-button" onclick="closeAddMoneyScreen()">←</button>
+        <p id="add-money-amount" class="money-display">$0</p>
+        <div class="numpad">
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button onclick="appendNumber('.')">.</button>
+            <button onclick="appendNumber('0')">0</button>
+            <button onclick="clearAmount()">⌫</button>
+        </div>
+        <button class="continue-button" onclick="addMoney()">Continue</button>
+    </div>
+
+    <!-- Withdraw Screen -->
+    <div id="withdraw-screen" class="fullscreen-modal">
+        <p style="font-size: 20px;">Withdraw Money</p>
+        <p id="withdraw-amount" class="money-display">$0</p>
+        <input type="range" min="0" max="500" value="0" class="slider" id="withdraw-slider" oninput="updateWithdrawDisplay()">
+        <button class="continue-button" onclick="withdrawMoney()">Withdraw</button>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-circle"></div>
+        <p class="loading-text">Processing...</p>
+    </div>
+
+    <!-- Confirmation Screen -->
+    <div id="confirmation-screen" class="confirmation-screen">
+        <div class="confirmation-circle">✓</div>
+        <p class="confirmation-message" id="confirmation-message"></p>
+        <button class="done-button" onclick="closeConfirmationScreen()">Done</button>
+    </div>
+
+    <script>
+        // Load balance from localStorage or set default
+        let balance = parseFloat(localStorage.getItem('balance')) || 500.00;
+        document.getElementById('balance').innerText = balance.toFixed(2);
+
+        let currentAmount = '0';
+
+        // Add Money Screen Functions
+        function openAddMoneyScreen() {
+            document.getElementById("add-money-screen").classList.add("active");
+            currentAmount = '0'; // Reset the amount
+            updateAddMoneyDisplay();
+        }
+
+        function closeAddMoneyScreen() {
+            document.getElementById("add-money-screen").classList.remove("active");
+            currentAmount = '0'; // Reset the amount
+            updateAddMoneyDisplay();
+        }
+
+        function appendNumber(number) {
+            if (currentAmount === '0' && number !== '.') {
+                currentAmount = '';
+            }
+            currentAmount += number;
+            updateAddMoneyDisplay();
+        }
+
+        function clearAmount() {
+            currentAmount = '0';
+            updateAddMoneyDisplay();
+        }
+
+        function updateAddMoneyDisplay() {
+            const display = document.getElementById("add-money-amount");
+            display.innerText = `$${currentAmount}`;
+            display.classList.add("updated");
+            setTimeout(() => display.classList.remove("updated"), 300);
+        }
+
+        function addMoney() {
+            let amount = parseFloat(currentAmount);
+            if (isNaN(amount) || amount <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+
+            // Show loading screen
+            document.getElementById("loading-screen").classList.add("active");
+
+            // Simulate a delay (e.g., 2 seconds)
+            setTimeout(() => {
+                // Hide loading screen
+                document.getElementById("loading-screen").classList.remove("active");
+
+                // Update balance
+                balance += amount;
+                localStorage.setItem('balance', balance);
+                document.getElementById("balance").innerText = balance.toFixed(2);
+
+                // Show confirmation screen
+                showConfirmationScreen(`You added $${amount.toFixed(2)} to your Cash App`);
+
+                // Reset the "Add Money" screen
+                closeAddMoneyScreen();
+            }, 2000); // 2 seconds delay
+        }
+
+        // Withdraw Money Functions
+        function openWithdrawScreen() {
+            document.getElementById("withdraw-screen").classList.add("active");
+            updateWithdrawDisplay();
+        }
+
+        function updateWithdrawDisplay() {
+            let slider = document.getElementById("withdraw-slider");
+            document.getElementById("withdraw-amount").innerText = "$" + slider.value;
+        }
+
+        function withdrawMoney() {
+            let amount = parseFloat(document.getElementById("withdraw-slider").value);
+            if (amount > balance) {
+                alert("Insufficient funds");
+            } else {
+                // Show loading screen
+                document.getElementById("loading-screen").classList.add("active");
+
+                // Simulate a delay (e.g., 2 seconds)
+                setTimeout(() => {
+                    // Hide loading screen
+                    document.getElementById("loading-screen").classList.remove("active");
+
+                    // Update balance
+                    balance -= amount;
+                    localStorage.setItem('balance', balance);
+                    document.getElementById("balance").innerText = balance.toFixed(2);
+
+                    // Show confirmation screen
+                    showConfirmationScreen(`$${amount.toFixed(2)} was instantly deposited to your bank account`);
+
+                    // Close the withdraw screen
+                    document.getElementById("withdraw-screen").classList.remove("active");
+                }, 2000); // 2 seconds delay
+            }
+        }
+
+        // Confirmation Screen Functions
+        function showConfirmationScreen(message) {
+            document.getElementById("confirmation-message").innerText = message;
+            document.getElementById("confirmation-screen").classList.add("active");
+        }
+
+        function closeConfirmationScreen() {
+            document.getElementById("confirmation-screen").classList.remove("active");
+        }
+
+        // Bottom Section Functions (Placeholder)
+        function openSavingsScreen() {
+            alert("Savings screen coming soon!");
+        }
+
+        function openInvestingScreen() {
+            alert("Investing screen coming soon!");
+        }
+
+        function openBitcoinScreen() {
+            alert("Bitcoin screen coming soon!");
+        }
+
+        function openStocksScreen() {
+            alert("Stocks screen coming soon!");
+        }
+    </script>
+</body>
+</html>
